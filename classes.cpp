@@ -4,7 +4,7 @@
 using namespace std;
 
 class Venue {
-    string location = "";
+    char* location = "";
     int maxNoSeats = 0;
     int noSeatsAvailable = 0;
     int noRows = 0;
@@ -12,15 +12,18 @@ class Venue {
     int maxNoEntrances = 0;
     string venueType = "";
 public:
-    void setLocation(string location) {
-        if (strlen(location.c_str()) == 0) {
-            throw runtime_error("Provide not an empty string.");
+    void setLocation(char* newLocation) {
+        delete[] this->location;
+        if (strlen(newLocation) == 0) {
+            throw runtime_error("Provide a name, not an empty string.");
         }
-        this->location = location;
+        strncpy(this->location, newLocation, strlen(newLocation) + 1);
     }
 
-    string getLoctaion() {
-        return this->location;
+    char* getLocation() {
+        char* locationCopy = new char[strlen(this->location) + 1];
+        strncpy(locationCopy, this->location, strlen(this->location) + 1);
+        return locationCopy;
     }
 
     void setMaxNoSeats(int mSeats) {
@@ -109,23 +112,72 @@ public:
         this->setVenueType("Unknown");
     }
 
-    Venue(string location, int maxNoSeats, int noRows, int noSeatsAvailable, int entranceNo, int maxNoEntrances, string venueType)
-        : location(location), 
-          maxNoSeats(maxNoSeats), 
-          noRows(noRows),
-          noSeatsAvailable(noSeatsAvailable),
-          entranceNo(entranceNo),
-          maxNoEntrances(maxNoEntrances),
-          venueType(venueType) {
+    Venue(char* location, int maxNoSeats, int noRows, int noSeatsAvailable, int entranceNo, int maxNoEntrances, string venueType) {
         if (maxNoSeats <= 0 || noSeatsAvailable < 0 || noRows <= 0 || entranceNo < 0 || maxNoEntrances <= 0) {
             throw std::runtime_error("Invalid input. Ensure positive values for maximum seats, available seats, rows, entrance number, and maximum entrances.");
         }
+        this->setLocation(location);
+        this->setMaxNoSeats(maxNoSeats);
+        this->setNoRows(noRows);
+        this->setNoSeatsAvailable(noSeatsAvailable);
+        this->setEntranceNo(entranceNo);
+        this->setMaxNoEntrances(maxNoEntrances);
+        this->setVenueType(venueType);
     }
-    ~Venue() {
 
+    Venue(Venue& v) {
+        this->setLocation(v.getLocation());
+        this->setMaxNoSeats(v.maxNoSeats);
+        this->setNoRows(v.noRows);
+        this->setNoSeatsAvailable(v.noSeatsAvailable);
+        this->setEntranceNo(v.entranceNo);
+        this->setMaxNoEntrances(v.maxNoEntrances);
+        this->setVenueType(v.venueType);
     }
+
+    ~Venue() {
+        delete[] this->location;
+    }
+
+    void displayAttribute(string attributeName) {
+        if (attributeName == "Location") {
+            cout << "Location" << getLocation() << endl;
+        }
+        else if (attributeName == "Max No Of Seats") {
+            cout << "Max No Of Seats" << getMaxNoSeats() << endl;
+        }
+        else if (attributeName == "No Of Rows") {
+            cout << "No Of Rows" << getNoRows() << endl;
+        }
+        else if (attributeName == "No Of Seats Available") {
+            cout << "No Of Seats Available" << getNoAvailiableSeats() << endl;
+        }
+        else if (attributeName == "Entrance No") {
+            cout << "Entrance No" << getEntranceNo() << endl;
+        }
+        else if (attributeName == "Max No Of The Entrances") {
+            cout << "Max No Of The Entrances" << getMaxNoEntrances() << endl;
+        }
+        else if (attributeName == "Venue Type") {
+            cout << "Venue Type" << getVenueType() << endl;
+        }
+        else {
+            cout << "Unknown attribute." << endl;
+        }
+    }
+
+    friend void operator<<(ostream& console, Venue& v);
 };
 
+void operator<<(ostream& console, Venue& v){
+    console << endl << "Venue Location: " << v.getLocation();
+    console << endl << "Venue Max No Of Seats: " << v.maxNoSeats;
+    console << endl << "Venue No Of Rows" << v.noRows;
+    console << endl << "Venue No Of Seats Available" << v.noSeatsAvailable;
+    console << endl << "Entrance No" << v.entranceNo;
+    console << endl << "Venue Max No Of The Entrances" << v.maxNoEntrances;
+    console << endl << "Venue Type" << v.venueType;
+}
 
 class Event {
     char eventDate[11] = "";      // dd/mm/yyyy
