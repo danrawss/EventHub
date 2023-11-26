@@ -150,36 +150,91 @@ public:
 
     void displayAttribute(string attributeName) {
         if (attributeName == "Location") {
-            cout << "Location: " << getLocation() << endl;
+            cout << endl << "Location: " << getLocation() << endl;
         }
         else if (attributeName == "Max No Of Seats") {
-            cout << "Max No Of Seats: " << getMaxNoSeats() << endl;
+            cout << endl <<"Max No Of Seats: " << getMaxNoSeats() << endl;
         }
         else if (attributeName == "No Of Rows") {
-            cout << "No Of Rows: " << getNoRows() << endl;
+            cout << endl <<"No Of Rows: " << getNoRows() << endl;
         }
         else if (attributeName == "No Of Seats Available") {
-            cout << "No Of Seats Available: " << getNoAvailiableSeats() << endl;
+            cout << endl << "No Of Seats Available: " << getNoAvailiableSeats() << endl;
         }
         else if (attributeName == "Entrance No") {
-            cout << "Entrance No: " << getEntranceNo() << endl;
+            cout << endl << "Entrance No: " << getEntranceNo() << endl;
         }
         else if (attributeName == "Max No Of The Entrances") {
-            cout << "Max No Of The Entrances: " << getMaxNoEntrances() << endl;
+            cout << endl << "Max No Of The Entrances: " << getMaxNoEntrances() << endl;
         }
         else if (attributeName == "Venue Type") {
-            cout << "Venue Type: " << getVenueType() << endl;
+            cout << endl << "Venue Type: " << getVenueType() << endl;
         }
         else {
-            cout << "Unknown attribute." << endl;
+            cout << endl << "Unknown attribute." << endl;
         }
     }
 
+    bool isVenueAvailable() {
+        return (getNoAvailiableSeats() > 0);
+    }
+
+    void operator=(const Venue& source) {
+        if (&source == this) {
+            return;
+        }
+
+        delete[] this->location;
+        this->location = new char[strlen(source.location) + 1];
+        this->setLocation(source.location);
+        this->setMaxNoSeats(source.maxNoSeats);
+        this->setNoRows(source.noRows);
+        this->setNoSeatsAvailable(source.noSeatsAvailable);
+        this->setMaxNoEntrances(source.maxNoEntrances);
+        this->setEntranceNo(source.entranceNo);
+        this->setVenueType(source.venueType);
+    }
+
+    void operator+=(int s) {
+        if (this->maxNoSeats += s <= 0) {
+            throw runtime_error("Provide another value.");
+        }
+        else {
+            this->maxNoSeats += s;
+        }
+    }
+
+    //postfix 
+    Venue operator++(int) {
+        Venue copy = *this;
+        this->maxNoEntrances += 1;
+        return copy;
+    }
+
+    //prefix
+    Venue operator++() {
+        this->maxNoEntrances += 1;
+        return *this;
+    }
+
+    bool operator!() {
+        return getNoAvailiableSeats() == 0; 
+    }
+
+    bool operator>=(Venue v) {
+        return (this->getNoAvailiableSeats() >= v.noSeatsAvailable);
+    }
+
+    bool operator==(Venue v) {
+        return (strcmp(this->getLocation(), v.location) == 0);
+    }
+
     friend void operator<<(ostream& console, Venue& v);
+    friend void operator>>(istream& console, Venue& v);
 };
 
-void operator<<(ostream& console, Venue& v){
-    console << endl << "Venue Location: " << v.getLocation();
+void operator<<(ostream& console, Venue& v) {
+    console << endl << "Venue Location: " << v.location;
     console << endl << "Venue Max No Of Seats: " << v.maxNoSeats;
     console << endl << "Venue No Of Rows: " << v.noRows;
     console << endl << "Venue No Of Seats Available: " << v.noSeatsAvailable;
@@ -188,10 +243,47 @@ void operator<<(ostream& console, Venue& v){
     console << endl << "Venue Type: " << v.venueType;
 }
 
+void operator>>(istream& console, Venue& v) {
+    cout << "Enter the location: ";
+    char newLocation[100];   
+    console.getline(newLocation, sizeof(newLocation));
+    v.setLocation(newLocation);
+
+    cout << "Enter Max No Of Seats: ";
+    int maxNoOfSeats;
+    console >> maxNoOfSeats;
+    v.setMaxNoSeats(maxNoOfSeats);
+
+    cout << "Enter The No Of Rows: ";
+    int noRows;
+    console >> noRows;
+    v.setNoRows(noRows);
+
+    cout << "Enter No Of Seats Available: ";
+    int noSeatsAvailable;
+    console >> noSeatsAvailable;
+    v.setNoSeatsAvailable(noSeatsAvailable);
+
+    cout << "Enter Max No Of Entrances: ";
+    int maxNoEntrances;
+    console >> maxNoEntrances;
+    v.setMaxNoEntrances(maxNoEntrances);
+
+    cout << "Enter The Entrance No: ";
+    int entranceNo;
+    console >> entranceNo;
+    v.setEntranceNo(entranceNo);
+
+    cout << "Enter Venue Type: ";
+    string venueType;
+    getline(console, venueType);
+    v.setVenueType(venueType);
+}
+
 class Event {
     char eventDate[11] = "";      // dd/mm/yyyy
     char* eventName = nullptr;
-    string eventTime = "";        // hh:mm:ss
+    string eventTime = "";        // hh:mm
     string eventType = "";
     int eventDuration = 0;   //in minutes
     static int TOTAL_EVENTS;
@@ -232,10 +324,10 @@ public:
     }
 
     void setEventTime(string newTime) {
-        if (strlen(newTime.c_str()) != 8) {
+        if (strlen(newTime.c_str()) != 5) {
             throw runtime_error("Wrong time.");
         }
-        if (newTime[2] != ':' || newTime[5] != ':') {
+        if (newTime[2] != ':') {
             throw runtime_error("Wrong time format.");
         }
         this->eventTime = newTime;
@@ -270,9 +362,9 @@ public:
     }
 
     Event() {
-        this->setEventDate("Unknown");
+        this->setEventDate("00/00/0000");
         this->setEventName("Unknown");
-        this->setEventTime("00:00:00");
+        this->setEventTime("00:00");
         this->setEventType("Unknown");
         this->setEventDuration(1);
         Event::TOTAL_EVENTS += 1;
@@ -309,8 +401,81 @@ public:
         this->setEventDuration(e.getEventDuration());
     }
 
-    
+    void displayAttribute(string attributeName) {
+        if (attributeName == "Event Name") {
+            cout << "Event Name: " << getEventName() << endl;
+        }
+        if (attributeName == "Event Date") {
+            cout << "Event Date: " << getEventDate() << endl;
+        }
+        if (attributeName == "Event Time") {
+            cout << "Event Time: " << getEventTime() << endl;
+        }
+        if (attributeName == "Event Type") {
+            cout << "Event Type: " << getEventType() << endl;
+        }
+        if (attributeName == "Event Duration") {
+            cout << "Event Duration: " << getEventDuration() << " minutes"<< endl;
+        }
+        if (attributeName == "Total Events") {
+            cout << "Total Events: " << Event::TOTAL_EVENTS << endl;
+        }
+    }
+
+    bool isEventTypeConcert() {
+        return (getEventType() == "Concert");
+    }
+
+    void operator=(const Event& source) {
+        if (&source == this) {
+            return;
+        }
+
+        delete[] this->eventName;
+        this->eventName = new char[strlen(source.eventName) + 1];
+        this->setEventName(source.eventName);
+        this->setEventDate(source.eventDate);
+        this->setEventTime(source.eventTime);
+        this->setEventType(source.eventType);
+        this->setEventDuration(source.eventDuration);
+    }
+
+    void operator-=(int d) {
+        if (this->eventDuration -= d <= 0) {
+            throw runtime_error("Provide another value.");
+        }
+        else {
+            this->eventDuration -= d;
+        }
+    }
+
+    //postfix
+    Event operator++(int) {
+        Event copy = *this;
+        this->eventDuration += 1;
+        return copy;
+    }
+
+    //prefix
+    Event operator++() {
+        this->eventDuration += 1;
+        return *this;
+    }
+
+    bool operator!() {
+        return getEventDuration() == 0;
+    }
+
+    bool operator<=(Event e) {
+        return (this->getEventDuration() <= e.eventDuration);
+    }
+
+    bool operator==(Event e) {
+        return (strcmp(this->getEventDate(), e.eventDate) == 0);
+    }
+
     friend void operator<<(ostream& console, Event& e);
+    friend void operator>>(istream& console, Event& e);
 };
 
 void operator<<(ostream& console, Event& e) {
@@ -319,6 +484,33 @@ void operator<<(ostream& console, Event& e) {
     console << endl << "Event Time: " << e.eventTime;
     console << endl << "Event Type: " << e.eventType;
     console << endl << "Event Duration: " << e.eventDuration << " minutes.";
+}
+
+void operator>>(istream& console, Event& e) {
+    cout << "Enter the event name: ";
+    char newName[100]; 
+    console.getline(newName, sizeof(newName));
+    e.setEventName(newName);
+
+    cout << "Enter the event date (dd/mm/yyyy): ";
+    char newDate[11];
+    console.getline(newDate, sizeof(newDate));
+    e.setEventDate(newDate);
+
+    cout << "Enter the event time (hh:mm:ss): ";
+    string newTime;
+    getline(console, newTime);
+    e.setEventTime(newTime);
+
+    cout << "Enter the event type: ";
+    string newType;
+    getline(console, newType);
+    e.setEventType(newType);
+
+    cout << "Enter the event duration (in minutes): ";
+    int newDuration;
+    console >> newDuration;
+    e.setEventDuration(newDuration);
 }
 
 int Event::TOTAL_EVENTS = 0;
@@ -464,8 +656,93 @@ public:
         this->setIsValid(t.getIsValid());
     }
 
+    void displayAttribute(string attributeName) {
+        if (attributeName == "Ticket ID") {
+            cout << "Ticket ID: " << getTicketId() << endl;
+        }
+        if (attributeName == "Ticket Price") {
+            cout << "Ticket Price: " << getTicketPrice() << endl;
+        }
+        if (attributeName == "Ticket Holder Name") {
+            cout << "Ticket Holder Name: " << getTicketHolderName() << endl;
+        }
+        if (attributeName == "Ticket Type") {
+            cout << "Ticket Type: " << getTicketType() << endl;
+        }
+        if (attributeName == "Ticket Purchase Date") {
+            cout << "Ticket Purchase Date: " << getPurchaseDate() << endl;
+        }
+        if (attributeName == "Ticket Puchase Time") {
+            cout << "Ticket Purchase Time: " << getPurchaseTime() << endl;
+        }
+        if (attributeName == "Is Ticket Valid") {
+            if (getIsValid() == true) {
+                cout << "Ticket Is Valid" << endl;
+            }
+            else {
+                cout << "Ticket Is Not Valid" << endl;
+            }
+        }
+        if (attributeName == "Total Tickets") {
+            cout << "Total Tickets: " << Ticket::TOTAL_TICKETS << endl;
+        }
+    }
+
+    bool isTicketVIP() {
+        return (getTicketType() == "VIP");
+    }
+
+    void operator=(const Ticket& source) {
+        if (&source == this) {
+            return;
+        }
+
+        this->setTicketPrice(source.ticketPrice);
+        delete[] this->ticketHolderName;
+        this->ticketHolderName = new char[strlen(source.ticketHolderName) + 1];
+        this->setTicketHolderName(source.ticketHolderName);
+        this->setTicketType(source.ticketType);
+        this->setPurchaseDate(source.purchaseDate);
+        this->setPurchaseTime(source.purchaseTime);
+        this->setIsValid(source.isValid);
+    }
+
+    void operator *=(double m) {
+        if (m <= 0) {
+            throw runtime_error("Provide positive value.");
+        }
+        else {
+            this->ticketPrice *= m;
+        }
+    }
+
+    //postfix
+    Ticket operator++(int) {
+        Ticket copy = *this;
+        this->ticketPrice += 1;
+        return copy;
+    }
+
+    //prefix
+    Ticket operator++() {
+        this->ticketPrice += 1;
+        return *this;
+    }
+
+    bool operator!() {
+        return getTicketPrice() == 0;
+    }
+
+    bool operator>=(Ticket t) {
+        return (this->getTicketPrice() >= t.ticketPrice);
+    }
+
+    bool operator==(Ticket t) {
+        return (strcmp(this->getTicketHolderName(), t.ticketHolderName) == 0);
+    }
 
     friend void operator<<(ostream& console, Ticket& t);
+    friend void operator>>(istream& console, Ticket& t);
 };
 
 void operator<<(ostream& console, Ticket& t) {
@@ -481,6 +758,42 @@ void operator<<(ostream& console, Ticket& t) {
     else {
         console << endl << "Ticket Is Not Valid";
     }
+}
+
+void operator>>(istream& console, Ticket& t) {
+    cout << "Enter the ticket price: ";
+    double newPrice;
+    console >> newPrice;
+    t.setTicketPrice(newPrice);
+
+    cout << "Enter the ticket holder name: ";
+    string ticketHolderName;
+    getline(console >> ws, ticketHolderName);
+    while (ticketHolderName.empty()) {
+        cout << "Ticket Holder Name cannot be empty. Enter a valid name: ";
+        getline(console >> ws, ticketHolderName);
+    }
+    t.setTicketHolderName(ticketHolderName.c_str());
+
+    cout << "Enter the ticket type: ";
+    string newType;
+    getline(console, newType);
+    t.setTicketType(newType);
+
+    cout << "Enter the purchase date (dd/mm/yyyy): ";
+    char newDate[11];
+    console.getline(newDate, sizeof(newDate));
+    t.setPurchaseDate(newDate);
+
+    cout << "Enter the purchase time (hh:mm:ss): ";
+    string newTime;
+    getline(console, newTime);
+    t.setPurchaseTime(newTime);
+
+    cout << "Is the ticket valid? (1 for true, 0 for false): ";
+    bool isValid;
+    console >> isValid;
+    t.setIsValid(isValid);
 }
 
 int Ticket::TOTAL_TICKETS = 0;
