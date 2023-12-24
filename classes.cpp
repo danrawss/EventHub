@@ -798,6 +798,3 @@ void operator>>(istream& console, Ticket& t) {
 
 int Ticket::TOTAL_TICKETS = 0;
 
-int main() {
-    
-}
