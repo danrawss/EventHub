@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -231,6 +232,21 @@ public:
 
     friend void operator<<(ostream& console, Venue& v);
     friend void operator>>(istream& console, Venue& v);
+
+    static void ProcessFromFile(const string& filename) {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Error opening file: " << filename << endl;
+            return;
+        }
+
+        file.close();
+    }
+
+    void displayInformation();
+
+    static void SaveToBinary();
+    static void LoadFromBinary();
 };
 
 void operator<<(ostream& console, Venue& v) {
@@ -476,6 +492,21 @@ public:
 
     friend void operator<<(ostream& console, Event& e);
     friend void operator>>(istream& console, Event& e);
+
+    static void ProcessFromFile(const string& filename) {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Error opening file: " << filename << endl;
+            return;
+        }
+
+        file.close();
+    }
+
+    void displayInformation();
+
+    static void SaveToBinary();
+    static void LoadFromBinary();
 };
 
 void operator<<(ostream& console, Event& e) {
@@ -743,6 +774,21 @@ public:
 
     friend void operator<<(ostream& console, Ticket& t);
     friend void operator>>(istream& console, Ticket& t);
+
+    static void ProcessFromFile(const string& filename) {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Error opening file: " << filename << endl;
+            return;
+        }
+
+        file.close();
+    }
+
+    void displayInformation();
+
+    static void SaveToBinary();
+    static void LoadFromBinary();
 };
 
 void operator<<(ostream& console, Ticket& t) {
@@ -797,4 +843,3 @@ void operator>>(istream& console, Ticket& t) {
 }
 
 int Ticket::TOTAL_TICKETS = 0;
-
