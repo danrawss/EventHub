@@ -843,3 +843,18 @@ void operator>>(istream& console, Ticket& t) {
 }
 
 int Ticket::TOTAL_TICKETS = 0;
+
+
+class Amount: public Ticket {
+    float price,qty,netamt;
+	public:
+		void add();
+		void show();
+		void report();
+		void calculate();
+		void pay();
+		float retnetamt()
+		{
+   		    return(netamt);
+		}
+}amt;
