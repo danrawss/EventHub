@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -843,6 +844,51 @@ void operator>>(istream& console, Ticket& t) {
 }
 
 int Ticket::TOTAL_TICKETS = 0;
+
+class Seats : public Venue {
+private:
+    int totalSeats;
+    int vipSeats;
+    vector<int> vipSeatNumbers; //Store VIP seat numbers
+
+public:
+    // Constructors
+    Seats() : Venue(), totalSeats(0), vipSeats(0) {
+
+    }
+
+    Seats(const char* loc, int maxSeats, int rows, int entrances, const string& type, int total, int vip)
+        : Venue(loc, maxSeats, rows, 0, entrances, entrances, type), totalSeats(total), vipSeats(vip) {
+        // Additional initialization specific to Seats
+        for (int i = 1; i <= vipSeats; ++i) {
+            vipSeatNumbers.push_back(i);
+        }
+    }
+
+    // Getter and setter for totalSeats
+    int getTotalSeats() const {
+        return totalSeats;
+    }
+
+    void setTotalSeats(int total) {
+        this->totalSeats = total;
+    }
+
+    // Getter and setter for vipSeats
+    int getVIPSeats() const {
+        return vipSeats;
+    }
+
+    void setVIPSeats(int vip) {
+        this->vipSeats = vip;
+    }
+
+    // Getter for vipSeatNumbers
+    const std::vector<int>& getVIPSeatNumbers() const {
+        return vipSeatNumbers;
+    }
+
+};
 
 
 class Amount: public Ticket {
