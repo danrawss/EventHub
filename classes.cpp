@@ -551,8 +551,8 @@ class Ticket {
     const int ticketId = 0;
     string ticketType = "";
     double ticketPrice = 0;
-    char* ticketHolderName = nullptr;
-    char purchaseDate[11] = "";
+    string ticketHolderName = "";
+    string purchaseDate = "";
     string purchaseTime = "";
     bool isValid = false;
     static int TOTAL_TICKETS;
@@ -561,7 +561,7 @@ public:
         return Ticket::TOTAL_TICKETS;
     }
 
-    int getTicketId() {
+    int getTicketId() const{
         return this->ticketId;
     }
 
@@ -574,7 +574,7 @@ public:
         }
     }
 
-    string getTicketType() {
+    string getTicketType() const{
         return this->ticketType;
     }
 
@@ -587,52 +587,31 @@ public:
         }
     }
 
-    double getTicketPrice() {
+    double getTicketPrice() const{
         return this->ticketPrice;
     }
 
-    void setTicketHolderName(const char* newName) {
-        delete[] this->ticketHolderName;
-        if (strlen(newName) == 0) {
-            throw runtime_error("Provide a name, not an empty string.");
-        }
-        this->ticketHolderName = new char[strlen(newName) + 1];
-        strncpy(this->ticketHolderName, newName, strlen(newName) + 1);
+    void setTicketHolderName(string newName) {
+        this->ticketHolderName = newName;
     }
 
-    char* getTicketHolderName() {
-        char* ticketHolderCopy = new char[strlen(this->ticketHolderName) + 1];
-        strncpy(ticketHolderCopy, this->ticketHolderName, strlen(this->ticketHolderName) + 1);
-        return ticketHolderCopy;
+    string getTicketHolderName() const{
+        return this->ticketHolderName;
     }
 
-    void setPurchaseDate(const char* newDate) {
-        if (strlen(newDate) != 10) {
-            throw runtime_error("Wrong date.");
-        }
-        if (newDate[2] != '/' || newDate[5] != '/') {
-            throw runtime_error("Wrong date format.");
-        }
-        strncpy(this->purchaseDate, newDate, 11);
+    void setPurchaseDate(string newDate) {
+        this->purchaseDate = newDate;
     }
 
-    char* getPurchaseDate() {
-        char* purchaseDateCopy = new char[11];
-        strncpy(purchaseDateCopy, this->purchaseDate, 11);
-        return purchaseDateCopy;
+    string getPurchaseDate() const{
+        return this->purchaseDate;
     }
 
     void setPurchaseTime(string newTime) {
-        if (strlen(newTime.c_str()) != 8) {
-            throw runtime_error("Wrong time.");
-        }
-        if (newTime[2] != ':' || newTime[5] != ':') {
-            throw runtime_error("Wrong time format.");
-        }
         this->purchaseTime = newTime;
     }
 
-    string getPurchaseTime() {
+    string getPurchaseTime() const{
         return this->purchaseTime;
     }
 
@@ -640,7 +619,7 @@ public:
         this->isValid = isValid;
     }
 
-    bool getIsValid () {
+    bool getIsValid () const{
         return this->isValid;
     }
 
@@ -664,7 +643,7 @@ public:
         Ticket::TOTAL_TICKETS += 1;
     }
 
-    Ticket(int ticketId, string ticketType, double ticketPrice, const char* ticketHolderName, const char* purchaseDate, string purchaseTime, bool isValid) : ticketId(ticketId){
+    Ticket(int ticketId, string ticketType, double ticketPrice, string ticketHolderName, string purchaseDate, string purchaseTime, bool isValid) : ticketId(ticketId){
         this->setTicketType(ticketType);
         this->setTicketPrice(ticketPrice);
         this->setTicketHolderName(ticketHolderName);
@@ -675,7 +654,6 @@ public:
     }
 
     ~Ticket() {
-        delete[] this->ticketHolderName;
         Ticket::TOTAL_TICKETS -= 1;
     }
 
@@ -730,8 +708,6 @@ public:
         }
 
         this->setTicketPrice(source.ticketPrice);
-        delete[] this->ticketHolderName;
-        this->ticketHolderName = new char[strlen(source.ticketHolderName) + 1];
         this->setTicketHolderName(source.ticketHolderName);
         this->setTicketType(source.ticketType);
         this->setPurchaseDate(source.purchaseDate);
@@ -767,10 +743,6 @@ public:
 
     bool operator>=(Ticket t) {
         return (this->getTicketPrice() >= t.ticketPrice);
-    }
-
-    bool operator==(Ticket t) {
-        return (strcmp(this->getTicketHolderName(), t.ticketHolderName) == 0);
     }
 
     friend void operator<<(ostream& console, Ticket& t);
@@ -891,16 +863,126 @@ public:
 };
 
 
-class Amount: public Ticket {
-    float price,qty,netamt;
-	public:
-		void add();
-		void show();
-		void report();
-		void calculate();
-		void pay();
-		float retnetamt()
-		{
-   		    return(netamt);
-		}
-}amt;
+class TicketManager {
+private:
+    Venue venue;
+    vector<Ticket> tickets;
+
+public:
+    void addNewTicket() {
+        int ticketId;  // You may generate a unique ID or use another strategy
+        string ticketType;
+        double ticketPrice;
+        string ticketHolderName;
+        char purchaseDate[11];  // You may use a string instead of char array if preferred
+        string purchaseTime;
+        bool isValid;
+
+        // Interaction with the user to get ticket information
+        cout << "Enter ticket type: ";
+        cin >> ticketType;
+        cout << "Enter ticket price: ";
+        cin >> ticketPrice;
+        cout << "Enter ticket holder name: ";
+        cin.ignore();  // Ignore the newline character left in the buffer
+        getline(cin, ticketHolderName);
+        cout << "Enter purchase date (dd/mm/yyyy): ";
+        cin >> purchaseDate;
+        cout << "Enter purchase time (hh:mm): ";
+        cin >> purchaseTime;
+        cout << "Is the ticket valid? (1 for true, 0 for false): ";
+        cin >> isValid;
+
+        // Create a new Ticket object and add it to the tickets vector
+        Ticket newTicket{ticketId, ticketType, ticketPrice, ticketHolderName, purchaseDate, purchaseTime, isValid};
+        tickets.push_back(newTicket);
+
+        cout << "New ticket added successfully!\n";
+    }
+
+    void displayAllTickets() {
+        if (tickets.empty()) {
+            cout << "No tickets to display.\n";
+            return;
+        }
+
+        cout << "All Tickets:\n";
+        for (const Ticket& ticket : tickets) {
+            cout << "Ticket ID: " << ticket.getTicketId() << "\n";
+            cout << "Type: " << ticket.getTicketType() << "\n";
+            cout << "Price: " << ticket.getTicketPrice() << "\n";
+            cout << "Holder Name: " << ticket.getTicketHolderName() << "\n";
+            cout << "Purchase Date: " << ticket.getPurchaseDate() << "\n";
+            cout << "Purchase Time: " << ticket.getPurchaseTime() << "\n";
+            cout << "Valid: " << (ticket.getIsValid() ? "Yes" : "No") << "\n";
+            cout << "-----------------------------\n";
+        }
+    }
+
+    void saveTicketsToBinaryFile(const string& filename) {
+        // Implement logic to save tickets to a binary file
+        ofstream file(filename, ios::binary | ios::out);
+        if (file.is_open()) {
+            // Write the tickets vector to the binary file
+            file.write(reinterpret_cast<char*>(&tickets[0]), tickets.size() * sizeof(Ticket));
+            file.close();
+        } else {
+            cerr << "Error opening binary file: " << filename << endl;
+        }
+    }
+
+    void loadTicketsFromBinaryFile(const string& filename) {
+        // Implement logic to load tickets from a binary file
+        ifstream file(filename, ios::binary | ios::in);
+        if (file.is_open()) {
+            // Read the binary data into the tickets vector
+            Ticket ticket;
+            while (file.read(reinterpret_cast<char*>(&ticket), sizeof(Ticket))) {
+                tickets.push_back(ticket);
+            }
+            file.close();
+        } else {
+            cerr << "Error opening binary file: " << filename << endl;
+        }
+    }
+
+    void displayMenu() {
+        int choice;
+        do {
+            cout << "1. Add a new ticket\n";
+            cout << "2. Display all tickets\n";
+            cout << "3. Save tickets to binary file\n";
+            cout << "4. Load tickets from binary file\n";
+            cout << "5. Exit\n";
+            cout << "Enter your choice: ";
+            cin >> choice;
+
+            switch (choice) {
+                case 1:
+                    addNewTicket();
+                    break;
+                case 2:
+                    displayAllTickets();
+                    break;
+                case 3:
+                    saveTicketsToBinaryFile("tickets.bin");
+                    break;
+                case 4:
+                    loadTicketsFromBinaryFile("tickets.bin");
+                    break;
+                case 5:
+                    cout << "Exiting...\n";
+                    break;
+                default:
+                    cout << "Invalid choice. Please try again.\n";
+            }
+        } while (choice != 5);
+    }
+};
+
+int main() {
+    TicketManager ticketManager;
+    ticketManager.displayMenu();
+
+    return 0;
+}
