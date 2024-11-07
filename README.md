@@ -1,7 +1,7 @@
-# Venue Management System
+# Event Management System
 
 ## Overview
-The Venue Management System is a C++ project that manages venues, events, and ticketing operations. Users can enter venue, event, and ticket information through console input or by reading from a text file. This project demonstrates the use of classes, constructors, memory management, operator overloading, and object-oriented programming in C++.
+The Event Management System is a C++ project that manages venues, events, and ticketing operations. Users can enter venue, event, and ticket information through console input or by reading from a text file. This project demonstrates the use of classes, constructors, memory management, operator overloading, and object-oriented programming in C++.
 
 ### Key Features
 - **Venue Management**: Define and manage venue details such as seats, rows, and zones. Users can book seats and check availability.
